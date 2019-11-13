@@ -15,12 +15,12 @@ public class RealtyType {
     private String name;
 
     @Column(nullable = false)
-    private float coefficient;
+    private double coefficient;
 
     public RealtyType() {
     }
 
-    public RealtyType(String name, float coefficient) {
+    public RealtyType(String name, double coefficient) {
         this.name = name;
         this.coefficient = coefficient;
     }
@@ -41,11 +41,11 @@ public class RealtyType {
         this.name = name;
     }
 
-    public float getCoefficient() {
+    public double getCoefficient() {
         return coefficient;
     }
 
-    public void setCoefficient(float coefficient) {
+    public void setCoefficient(double coefficient) {
         this.coefficient = coefficient;
     }
 

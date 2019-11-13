@@ -18,12 +18,12 @@ public class BuildYear {
     private int endYear;
 
     @Column(nullable = false)
-    private float coefficient;
+    private double coefficient;
 
     public BuildYear() {
     }
 
-    public BuildYear(int startYear, int endYear, float coefficient) {
+    public BuildYear(int startYear, int endYear, double coefficient) {
         this.startYear = startYear;
         this.endYear = endYear;
         this.coefficient = coefficient;
@@ -53,11 +53,11 @@ public class BuildYear {
         this.endYear = endYear;
     }
 
-    public float getCoefficient() {
+    public double getCoefficient() {
         return coefficient;
     }
 
-    public void setCoefficient(float coefficient) {
+    public void setCoefficient(double coefficient) {
         this.coefficient = coefficient;
     }
 

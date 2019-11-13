@@ -1,0 +1,15 @@
+.errorlable{
+    color: red !important;
+}
+
+.lable-title-bold{
+    color: #7c795d !important;
+    font-family: ‘Trocchi’, serif !important;
+    font-size: 32px !important;
+    font-weight: normal !important;
+}
+
+.form-title>div>div>span{
+    color: darkgreen !important;
+    font-weight: bold !important;
+}

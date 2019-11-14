@@ -13,3 +13,41 @@
     color: darkgreen !important;
     font-weight: bold !important;
 }
+
+.arm-title>div>div>span{
+    color: darkgreen !important;
+    font-weight: bold !important;
+}
+
+.panel-title>div>div>span{
+    color: #1e2ca0 !important;
+    font-weight: bold !important;
+}
+
+.lable-group-caption{
+    color: #145157 !important;
+    font-weight: bold !important;
+    font-style: italic;
+}
+
+.v-caption-lable-group-caption>span:nth-child(1){
+    color: #145157 !important;
+    font-weight: bold !important;
+    font-style: italic;
+}
+
+.v-caption-lable-tf-caption{
+    color: #145157 !important;
+    font-weight: bold !important;
+    font-style: italic;
+}
+
+.v-slot-lable-tf-caption input{
+    font-style: italic !important;
+}
+
+.v-caption-lable-login-caption span{
+    color: #145157 !important;
+    font-weight: bold !important;
+    font-style: italic;
+}

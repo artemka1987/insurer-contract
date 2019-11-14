@@ -9,6 +9,7 @@ import ru.kupchenkov.additional.OnEnterKeyHandler;
 import ru.kupchenkov.dao.UserDao;
 import ru.kupchenkov.entity.User;
 import ru.kupchenkov.resource.Images;
+import ru.kupchenkov.service.AuthenticationService;
 import ru.kupchenkov.view.user.UserView;
 
 public class LoginView extends VerticalLayout implements View {
@@ -39,7 +40,10 @@ public class LoginView extends VerticalLayout implements View {
             flayout.setMargin(true);
             tfUserName.focus();
             tfUserName.setIcon(Images.icoUser);
+            tfUserName.focus();
+            tfUserName.addStyleName("lable-login-caption");
             password.setIcon(Images.icoPassword);
+            password.addStyleName("lable-login-caption");
             Button btnLogin = new Button("Войти", Images.icoUnlock);
                 btnLogin.setStyleName(ValoTheme.BUTTON_PRIMARY);
                 btnLogin.setWidth(100, Unit.PERCENTAGE);
@@ -85,8 +89,7 @@ public class LoginView extends VerticalLayout implements View {
         public void buttonClick(Button.ClickEvent clickEvent) {
             flayout.removeComponent(resultLabel);
             flayout.addComponent(resultLabel);
-            UserDao userDao = new UserDao(AdditionalUtils.getFactory(VaadinSession.getCurrent()).createEntityManager());
-            user = userDao.findByLoginPassword(tfUserName.getValue(), password.getValue());
+            user =  new AuthenticationService().authenticate(tfUserName.getValue(), password.getValue());
             if (user == null) {
                 resultLabel.setValue("Пользователь не найден ");
             } else {

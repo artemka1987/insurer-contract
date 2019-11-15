@@ -1,16 +1,13 @@
 package ru.kupchenkov.view;
 
 import com.vaadin.navigator.View;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
-import ru.kupchenkov.additional.AdditionalUtils;
 import ru.kupchenkov.additional.OnEnterKeyHandler;
-import ru.kupchenkov.dao.UserDao;
 import ru.kupchenkov.entity.User;
 import ru.kupchenkov.resource.Images;
 import ru.kupchenkov.service.AuthenticationService;
-import ru.kupchenkov.view.user.UserView;
+import ru.kupchenkov.view.user.view.UserView;
 
 public class LoginView extends VerticalLayout implements View {
 

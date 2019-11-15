@@ -15,7 +15,7 @@ public class Images {
     public static final FileResource icoTable = new FileResource(new File(basepath + "/WEB-INF/images/table.png"));
     public static final FileResource icoNew = new FileResource(new File(basepath + "/WEB-INF/images/new.png"));
     public static final FileResource icoEdit = new FileResource(new File(basepath + "/WEB-INF/images/edit.png"));
-    public static final FileResource icoContract = new FileResource(new File(basepath + "/WEB-INF/images/contract.png"));
+    public static final FileResource icoContract = new FileResource(new File(basepath + "/WEB-INF/images/window.png"));
     public static final FileResource icoCalculate = new FileResource(new File(basepath + "/WEB-INF/images/calc.png"));
     public static final FileResource icoSave = new FileResource(new File(basepath + "/WEB-INF/images/save.png"));
 

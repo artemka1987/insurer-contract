@@ -1,4 +1,4 @@
-package ru.kupchenkov.view.user.contract;
+package ru.kupchenkov.view.user.window;
 
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
@@ -38,6 +38,7 @@ public class ContractWindow extends Window {
     private TextField tfFlat = new TextField("Квартира");
     private Button btnSave = new Button("Сохранить", Images.icoSave);
     private Button btnBack = new Button("К списку договоров");
+    private TextArea taComment = new TextArea("Комментарий к договору(не печатается на полисе)");
 
     public ContractWindow() {
 
@@ -146,19 +147,19 @@ public class ContractWindow extends Window {
                                 dfCalculateDate.addStyleName("lable-group-caption");
                                 //Tf calculate sum
                                 tfCalculateSum.addStyleName("lable-tf-caption");
-                //Vertical layout contract
+                //Vertical layout window
                 VerticalLayout vlContract = new VerticalLayout();
                     vlContract.setWidth(100, Unit.PERCENTAGE);
                     vlContract.setHeightUndefined();
                     vlContract.setMargin(false);
                     vlContract.setSpacing(true);
-                    //Horisontal layout contract number
+                    //Horisontal layout window number
                     HorizontalLayout hlContractNumber = new HorizontalLayout();
                         hlContractNumber.setWidth(100, Unit.PERCENTAGE);
                         hlContractNumber.setHeightUndefined();
                         hlContractNumber.setMargin(false);
                         hlContractNumber.setSpacing(true);
-                        //Tf contract number
+                        //Tf window number
                         tfContractNumber.addStyleName("lable-tf-caption");
                         tfContractNumber.setPlaceholder("№ договора");
                         tfContractNumber.setRequiredIndicatorVisible(true);
@@ -261,6 +262,15 @@ public class ContractWindow extends Window {
                         btnSave.setStyleName(ValoTheme.BUTTON_PRIMARY);
                         //Button back
                         btnBack.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+                    //Coment lable
+                    Label labelComment = new Label("КОММЕНТАРИЙ");
+                        labelComment.addStyleName("lable-l-caption");
+                    //Ta comment
+                    taComment.setWidth(100, Unit.PERCENTAGE);
+                    taComment.setPlaceholder("Укажите комментарий");
+                    taComment.addStyleName("lable-group-caption");
+                    taComment.setRows(2);
+                    taComment.setWordWrap(true);
 
 
 
@@ -309,6 +319,8 @@ public class ContractWindow extends Window {
                         hlAddress2.addComponent(tfBuilding);
                         hlAddress2.addComponent(tfBuilding2);
                         hlAddress2.addComponent(tfFlat);
+                    vlContract.addComponent(labelComment);
+                    vlContract.addComponent(taComment);
                     vlContract.addComponent(hlButons);
                         hlButons.addComponent(btnSave);
                         hlButons.addComponent(btnBack);

@@ -1,6 +1,10 @@
 package ru.kupchenkov.entity;
 
+import ru.kupchenkov.entity.embeded.AddressEmbeded;
+
 import javax.persistence.*;
+import java.util.Calendar;
+import java.util.Date;
 
 @Entity
 @Table
@@ -16,4 +20,119 @@ public class Realty {
     @ManyToOne(optional = false)
     private BuildYear buildYear;
 
+    @Column(nullable = false)
+    private double area;
+
+    @Embedded
+    private AddressEmbeded address;
+
+    @Column(nullable = false)
+    private double insurerSum;
+
+    @Column(nullable = false)
+    private Date startDate;
+
+    @Column(nullable = false)
+    private Date endDate;
+
+    @ManyToOne(optional = false)
+    private User userModify;
+
+    @Column(nullable = false)
+    private Calendar dateModify;
+
+    public Realty() {
+    }
+
+    public Realty(RealtyType realtyType, BuildYear buildYear, double area, AddressEmbeded address, double insurerSum, Date startDate, Date endDate, User userModify, Calendar dateModify) {
+        this.realtyType = realtyType;
+        this.buildYear = buildYear;
+        this.area = area;
+        this.address = address;
+        this.insurerSum = insurerSum;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.userModify = userModify;
+        this.dateModify = dateModify;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public RealtyType getRealtyType() {
+        return realtyType;
+    }
+
+    public void setRealtyType(RealtyType realtyType) {
+        this.realtyType = realtyType;
+    }
+
+    public BuildYear getBuildYear() {
+        return buildYear;
+    }
+
+    public void setBuildYear(BuildYear buildYear) {
+        this.buildYear = buildYear;
+    }
+
+    public double getArea() {
+        return area;
+    }
+
+    public void setArea(double area) {
+        this.area = area;
+    }
+
+    public AddressEmbeded getAddress() {
+        return address;
+    }
+
+    public void setAddress(AddressEmbeded address) {
+        this.address = address;
+    }
+
+    public double getInsurerSum() {
+        return insurerSum;
+    }
+
+    public void setInsurerSum(double insurerSum) {
+        this.insurerSum = insurerSum;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public User getUserModify() {
+        return userModify;
+    }
+
+    public void setUserModify(User userModify) {
+        this.userModify = userModify;
+    }
+
+    public Calendar getDateModify() {
+        return dateModify;
+    }
+
+    public void setDateModify(Calendar dateModify) {
+        this.dateModify = dateModify;
+    }
 }

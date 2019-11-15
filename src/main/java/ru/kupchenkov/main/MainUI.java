@@ -26,7 +26,7 @@ import java.time.LocalDate;
 
 
 @Theme("valo")
-@StyleSheet("vaadin://css/contract.css")
+@StyleSheet("vaadin://css/window.css")
 @Title("Договор страховщика")
 public class MainUI extends UI {
 
@@ -36,7 +36,7 @@ public class MainUI extends UI {
     @Override
     protected void init(VaadinRequest vaadinRequest) {
 
-        factory = Persistence.createEntityManagerFactory("Postgres");
+        factory = Persistence.createEntityManagerFactory("Mssql");
         VaadinSession.getCurrent().setAttribute("factory", factory);
         manager = factory.createEntityManager();
 

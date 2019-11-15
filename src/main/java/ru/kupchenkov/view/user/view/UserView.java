@@ -1,12 +1,11 @@
-package ru.kupchenkov.view.user;
+package ru.kupchenkov.view.user.view;
 
 import com.vaadin.navigator.View;
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import ru.kupchenkov.entity.User;
 import ru.kupchenkov.resource.Images;
-import ru.kupchenkov.view.user.contract.ContractWindow;
+import ru.kupchenkov.view.user.window.ContractWindow;
 
 public class UserView extends VerticalLayout implements View {
 

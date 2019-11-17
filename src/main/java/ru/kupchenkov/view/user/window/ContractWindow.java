@@ -182,6 +182,12 @@ public class ContractWindow extends Window {
                         //Button choose insurer
                         btnInsurerChoose.setStyleName(ValoTheme.BUTTON_PRIMARY);
                         btnInsurerChoose.setWidth(100, Unit.PERCENTAGE);
+                        btnInsurerChoose.addClickListener(new Button.ClickListener() {
+                            @Override
+                            public void buttonClick(Button.ClickEvent event) {
+                                getUI().addWindow(new PersonWindow(null));
+                            }
+                        });
                         //Tf insurer fio
                         tfInsurerFio.setWidth(100, Unit.PERCENTAGE);
                         tfInsurerFio.setEnabled(false);

@@ -14,14 +14,7 @@ public class UserDao {
     }
 
     public void save(User user) {
-        manager.getTransaction().begin();
-        try {
-            manager.persist(user);
-            manager.getTransaction().commit();
-        } catch (Exception e){
-            manager.getTransaction().rollback();
-            throw e;
-        }
+        manager.persist(user);
     }
 
     public User findById(int id) {

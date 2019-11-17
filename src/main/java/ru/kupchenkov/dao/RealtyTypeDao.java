@@ -14,14 +14,7 @@ public class RealtyTypeDao {
     }
 
     public void save(RealtyType realtyType) {
-        manager.getTransaction().begin();
-        try {
-            manager.persist(realtyType);
-            manager.getTransaction().commit();
-        } catch (Exception e){
-            manager.getTransaction().rollback();
-            throw e;
-        }
+        manager.persist(realtyType);
     }
 
     public List<RealtyType> getAll() {

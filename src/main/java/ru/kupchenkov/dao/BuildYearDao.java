@@ -14,14 +14,7 @@ public class BuildYearDao {
     }
 
     public void save(BuildYear buildYear) {
-        manager.getTransaction().begin();
-        try {
-            manager.persist(buildYear);
-            manager.getTransaction().commit();
-        } catch (Exception e) {
-            manager.getTransaction().rollback();
-            throw e;
-        }
+        manager.persist(buildYear);
     }
 
     public BuildYear findById(int id) {

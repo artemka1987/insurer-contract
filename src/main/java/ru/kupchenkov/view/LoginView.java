@@ -6,6 +6,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import ru.kupchenkov.additional.OnEnterKeyHandler;
 import ru.kupchenkov.entity.User;
 import ru.kupchenkov.resource.Images;
+import ru.kupchenkov.security.DesEncrypter;
 import ru.kupchenkov.service.AuthenticationService;
 import ru.kupchenkov.view.user.view.UserView;
 
@@ -86,7 +87,11 @@ public class LoginView extends VerticalLayout implements View {
         public void buttonClick(Button.ClickEvent clickEvent) {
             flayout.removeComponent(resultLabel);
             flayout.addComponent(resultLabel);
-            user =  new AuthenticationService().authenticate(tfUserName.getValue(), password.getValue());
+            try {
+                user = new AuthenticationService().authenticate(tfUserName.getValue(), new DesEncrypter().encrypt(password.getValue()));
+            } catch (Exception e) {
+                Notification.show("Ошибка авторизации: " + e.getMessage(), Notification.Type.ERROR_MESSAGE);
+            }
             if (user == null) {
                 resultLabel.setValue("Пользователь не найден ");
             } else {

@@ -45,7 +45,7 @@ public class MainUI extends UI {
     @Override
     protected void init(VaadinRequest vaadinRequest) {
 
-        factory = Persistence.createEntityManagerFactory("Postgres");
+        factory = Persistence.createEntityManagerFactory("Mssql");
         VaadinSession.getCurrent().setAttribute("factory", factory);
         manager = factory.createEntityManager();
 

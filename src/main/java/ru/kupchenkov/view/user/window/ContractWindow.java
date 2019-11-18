@@ -2,6 +2,8 @@ package ru.kupchenkov.view.user.window;
 
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
+import ru.kupchenkov.additional.AdditionalUtils;
+import ru.kupchenkov.entity.Person;
 import ru.kupchenkov.entity.RealtyType;
 import ru.kupchenkov.resource.Images;
 
@@ -185,7 +187,7 @@ public class ContractWindow extends Window {
                         btnInsurerChoose.addClickListener(new Button.ClickListener() {
                             @Override
                             public void buttonClick(Button.ClickEvent event) {
-                                getUI().addWindow(new PersonWindow(null));
+                                getUI().addWindow(new PersonWindow(null, ContractWindow.this));
                             }
                         });
                         //Tf insurer fio
@@ -355,4 +357,14 @@ public class ContractWindow extends Window {
         vlContract.setComponentAlignment(hlButons, Alignment.BOTTOM_CENTER);
     }
 
+
+    //Set person info
+    public void setPersonInfo(Person person) {
+        if (person != null) {
+            tfInsurerFio.setValue(person.getFio());
+            dfInsurerBirthdate.setValue(AdditionalUtils.dateToLocalDate(person.getBirthDate()));
+            tfInsurerDocumentSeries.setValue(person.getDocumentSeries());
+            tfInsurerDocumentNumber.setValue(String.valueOf(person.getDocumentNumber()));
+        }
+    }
 }

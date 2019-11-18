@@ -1,9 +1,16 @@
 package ru.kupchenkov.view.user.window;
 
+import com.vaadin.server.Page;
+import com.vaadin.server.VaadinSession;
+import com.vaadin.shared.Position;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
+import ru.kupchenkov.additional.AdditionalUtils;
+import ru.kupchenkov.dao.PersonDao;
 import ru.kupchenkov.entity.Person;
 import ru.kupchenkov.resource.Images;
+import javax.persistence.EntityManager;
+import java.sql.Date;
 
 public class PersonWindow extends Window {
 
@@ -15,8 +22,12 @@ public class PersonWindow extends Window {
     private DateField dfBirthDate = new DateField("Дата рождения");
     private TextField tfPassportSeries = new TextField("Серия паспорта");
     private TextField tfPassportNumber = new TextField("Номер пасспорта");
+    private Grid<Person> grid = new Grid<>();
+    private Button btnSave = new Button("Сохранить", Images.icoSave);
+    private Person localPerson;
 
-    public PersonWindow(Person person) {
+    public PersonWindow(Person person, ContractWindow contractWindow) {
+    this.localPerson = person;
 
     setWidth(1100,Unit.PIXELS);
     setHeightUndefined();
@@ -61,6 +72,22 @@ public class PersonWindow extends Window {
                             //Button search
                             btnSearch.setStyleName(ValoTheme.BUTTON_FRIENDLY);
                             btnSearch.setWidth(100, Unit.PERCENTAGE);
+                        //Grid
+                        grid.setWidth(100, Unit.PERCENTAGE);
+                        grid.setRowHeight(40d);
+                        grid.setHeightUndefined();
+                        grid.setColumnReorderingAllowed(true);
+                        //                    grid.addColumn(Certificate::getId).setCaption("Код").setWidth(100d).setHidable(true);
+                        //                    grid.addColumn(Certificate::getSeries).setCaption("Серия").setWidth(150d);
+                        //                    grid.addColumn(Certificate::getNumber).setCaption("Номер").setWidth(150d);
+                        //                    grid.addColumn(Certificate::getFio).setCaption("ФИО");
+                        //                    grid.addColumn(Certificate::getCertificateDate).setCaption("Дата выдачи").setWidth(150d);
+                        //                    grid.addComponentColumn(certificate -> {
+                        //                        return certificate.getBtnEdit();
+                        //                    }).setCaption("Ред-ть").setWidth(100d);
+                        //                    grid.addComponentColumn(certificate -> {
+                        //                        return certificate.getBtnPrint();
+                        //                    }).setCaption("Печать").setWidth(100d);
                 //Panel person
                 Panel panelPerson = new Panel("Страхователь");
                     panelPerson.setWidth(100, Unit.PERCENTAGE);
@@ -96,6 +123,68 @@ public class PersonWindow extends Window {
                             tfMiddleName.addStyleName("lable-tf-caption");
                             tfMiddleName.setPlaceholder("отчество");
                             tfMiddleName.setMaxLength(100);
+                        //Layout passport
+                        HorizontalLayout hlPassport = new HorizontalLayout();
+                            hlPassport.setWidth(100, Unit.PERCENTAGE);
+                            hlPassport.setHeightUndefined();
+                            hlPassport.setMargin(false);
+                            hlPassport.setSpacing(true);
+                            //Df birth date
+                            dfBirthDate.setPlaceholder("Дата рожд.");
+                            dfBirthDate.setWidth(160, Unit.PIXELS);
+                            dfBirthDate.addStyleName("lable-group-caption");
+                            dfBirthDate.setDateFormat("dd.MM.yyyy");
+                            dfBirthDate.setParseErrorMessage("Неверный формат даты");
+                            dfBirthDate.setRequiredIndicatorVisible(true);
+                            //Tf series
+                            tfPassportSeries.setWidth(100, Unit.PERCENTAGE);
+                            tfPassportSeries.addStyleName("lable-tf-caption");
+                            tfPassportSeries.setPlaceholder("Серия");
+                            tfPassportSeries.setMaxLength(5);
+                            tfPassportSeries.setRequiredIndicatorVisible(true);
+                            //Tf number
+                            tfPassportNumber.setWidth(100, Unit.PERCENTAGE);
+                            tfPassportNumber.addStyleName("lable-tf-caption");
+                            tfPassportNumber.setPlaceholder("Номер");
+                            tfPassportNumber.setMaxLength(6);
+                            tfPassportNumber.setRequiredIndicatorVisible(true);
+                        //Button save
+                        btnSave.setStyleName(ValoTheme.BUTTON_PRIMARY);
+                        btnSave.addClickListener(new Button.ClickListener() {
+                            @Override
+                            public void buttonClick(Button.ClickEvent clickEvent) {
+                                String errors = "";
+                                if (tfLastName.getValue().trim().length() == 0) errors += "\n Не заполнена фамилия";
+                                if (tfFirstName.getValue().trim().length() == 0) errors += "\n Не заполнено имя";
+                                if (dfBirthDate.getValue() == null) errors += "\n Не заполнена дата рождения";
+                                if (tfPassportSeries.getValue().trim().length() == 0) errors += "\n Не заполнена серия паспорта";
+                                if (tfPassportSeries.getValue().trim().length() < 5) errors += "\n Некорректно заполнена серия паспорта";
+                                if (tfPassportNumber.getValue().trim().length() == 0) errors += "\n Не заполнен номер паспорта";
+                                if (tfPassportNumber.getValue().trim().length() < 6 || !AdditionalUtils.isInteger(tfPassportNumber.getValue())) errors += "\n Некорректно заполнен номер паспорта";
+                                if (errors.trim().length() == 0) {
+                                    EntityManager manager = AdditionalUtils.getFactory(VaadinSession.getCurrent()).createEntityManager();
+                                    manager.getTransaction().begin();
+                                    try {
+                                        PersonDao personDao = new PersonDao(manager);
+                                        localPerson = new Person(tfLastName.getValue().trim(), tfFirstName.getValue().trim(),
+                                                tfMiddleName.getValue().trim(), Date.valueOf(dfBirthDate.getValue()),
+                                                tfPassportSeries.getValue(), Integer.valueOf(tfPassportNumber.getValue()));
+                                        personDao.save(localPerson);
+                                        manager.getTransaction().commit();
+                                        Notification notification = new Notification("Данные успешно сохранены");
+                                        notification.setPosition(Position.TOP_RIGHT);
+                                        notification.show(Page.getCurrent());
+                                        contractWindow.setPersonInfo(localPerson);
+                                        close();
+                                    } catch (Exception e) {
+                                        manager.getTransaction().rollback();
+                                        Notification.show("Ошибка сохранения: " + e.getMessage(), Notification.Type.ERROR_MESSAGE);
+                                    }
+                                } else {
+                                    Notification.show(errors, Notification.Type.WARNING_MESSAGE);
+                                }
+                            }
+                        });
 
 
         ///////////////////////////////////////////// Add to content ///////////////////////////////////////////////////
@@ -106,16 +195,23 @@ public class PersonWindow extends Window {
                         vlSearch.addComponent(hlSearchParams);
                             hlSearchParams.addComponent(tfFio);
                             hlSearchParams.addComponent(btnSearch);
+                        vlSearch.addComponent(grid);
                 hlContent.addComponent(panelPerson);
                     panelPerson.setContent(vlPerson);
                         vlPerson.addComponent(hlFio);
                             hlFio.addComponent(tfLastName);
                             hlFio.addComponent(tfFirstName);
                             hlFio.addComponent(tfMiddleName);
+                        vlPerson.addComponent(hlPassport);
+                            hlPassport.addComponent(dfBirthDate);
+                            hlPassport.addComponent(tfPassportSeries);
+                            hlPassport.addComponent(tfPassportNumber);
+                        vlPerson.addComponent(btnSave);
 
         ///////////////////////////////////////////////////// Aligment /////////////////////////////////////////////////
         hlSearchParams.setExpandRatio(tfFio, 8f);
         hlSearchParams.setExpandRatio(btnSearch, 1f);
         hlSearchParams.setComponentAlignment(btnSearch, Alignment.BOTTOM_LEFT);
+        vlPerson.setComponentAlignment(btnSave, Alignment.MIDDLE_RIGHT);
     }
 }

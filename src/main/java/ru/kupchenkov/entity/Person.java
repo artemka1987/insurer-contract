@@ -98,4 +98,8 @@ public class Person {
     public void setDocumentNumber(int documentNumber) {
         this.documentNumber = documentNumber;
     }
+
+    public String getFio() {
+        return lastName + " " + firstName + " " + middleName;
+    }
 }

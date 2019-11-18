@@ -17,14 +17,14 @@ public class ContractWindow extends Window {
     private ComboBox<RealtyType> cbRealtyType = new ComboBox<>("Тип недвижимости");
     private ComboBox<Integer> cbBuildYear = new ComboBox<>("Год постройки");
     private TextField tfBuildArea = new TextField("Площадь, кв.м.");
-    private Button btnCalculate = new Button("Рассчитать");
+    private Button btnCalculate = new Button("Рассчитать", Images.icoCalculate);
     private DateField dfCalculateDate = new DateField("Дата рассчета");
     private TextField tfCalculateSum = new TextField("Премия");
     private TextField tfContractNumber = new TextField("№ договора");
     private DateField dfContractDate = new DateField("Дата заключения");
-    private Button btnInsurerChoose = new Button("Выбрать");
+    private Button btnInsurerChoose = new Button("Выбрать", Images.icoChoose);
     private TextField tfInsurerFio = new TextField("Ф.И.О.");
-    private Button btnInsurerEdit = new Button("Изменить");
+    private Button btnInsurerEdit = new Button("Изменить", Images.icoEdit);
     private DateField dfInsurerBirthdate = new DateField("Дата рождения");
     private TextField tfInsurerDocumentSeries = new TextField("Серия паспорта");
     private TextField tfInsurerDocumentNumber = new TextField("Номер паспорта");
@@ -39,7 +39,7 @@ public class ContractWindow extends Window {
     private TextField tfBuilding2 = new TextField("Строение");
     private TextField tfFlat = new TextField("Квартира");
     private Button btnSave = new Button("Сохранить", Images.icoSave);
-    private Button btnBack = new Button("К списку договоров");
+    private Button btnBack = new Button("К списку договоров", Images.icoList);
     private TextArea taComment = new TextArea("Комментарий к договору(не печатается на полисе)");
 
     public ContractWindow() {
@@ -66,7 +66,7 @@ public class ContractWindow extends Window {
                 Panel panelCalculate = new Panel("Рассчет");
                     panelCalculate.setWidth(100, Unit.PERCENTAGE);
                     panelCalculate.setHeightUndefined();
-                    panelCalculate.setIcon(Images.icoCalculate);
+                    panelCalculate.setIcon(Images.icoCalc);
                     panelCalculate.addStyleName("arm-title-violet");
                     //Vertical layout calculate
                     VerticalLayout vlCalculate = new VerticalLayout();
@@ -276,7 +276,7 @@ public class ContractWindow extends Window {
                     //Ta comment
                     taComment.setWidth(100, Unit.PERCENTAGE);
                     taComment.setPlaceholder("Укажите комментарий");
-                    taComment.addStyleName("lable-group-caption");
+                    taComment.addStyleName("lable-tf-caption");
                     taComment.setRows(2);
                     taComment.setWordWrap(true);
 
@@ -337,9 +337,9 @@ public class ContractWindow extends Window {
         ////////////////////////////////////////////////// Aligment ////////////////////////////////////////////////////
         hlCalculateApply.setComponentAlignment(btnCalculate, Alignment.BOTTOM_LEFT);
         hlContractNumber.setComponentAlignment(dfContractDate, Alignment.MIDDLE_RIGHT);
-        hlInsurerFio.setExpandRatio(btnInsurerChoose, 1f);
-        hlInsurerFio.setExpandRatio(tfInsurerFio, 8f);
-        hlInsurerFio.setExpandRatio(btnInsurerEdit, 1f);
+        hlInsurerFio.setExpandRatio(btnInsurerChoose, 1.5f);
+        hlInsurerFio.setExpandRatio(tfInsurerFio, 7f);
+        hlInsurerFio.setExpandRatio(btnInsurerEdit, 1.5f);
         hlInsurerFio.setComponentAlignment(btnInsurerChoose, Alignment.BOTTOM_LEFT);
         hlInsurerFio.setComponentAlignment(btnInsurerEdit, Alignment.BOTTOM_RIGHT);
         hlInsurerBirthdate.setComponentAlignment(tfInsurerDocumentSeries, Alignment.MIDDLE_CENTER);

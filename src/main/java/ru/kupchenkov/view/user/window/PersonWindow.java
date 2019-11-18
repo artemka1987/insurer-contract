@@ -11,6 +11,7 @@ import ru.kupchenkov.entity.Person;
 import ru.kupchenkov.resource.Images;
 import javax.persistence.EntityManager;
 import java.sql.Date;
+import java.util.List;
 
 public class PersonWindow extends Window {
 
@@ -25,11 +26,14 @@ public class PersonWindow extends Window {
     private Grid<Person> grid = new Grid<>();
     private Button btnSave = new Button("Сохранить", Images.icoSave);
     private Person localPerson;
+    private PersonDao personDao;
+    private List<Person> personList;
 
     public PersonWindow(Person person, ContractWindow contractWindow) {
     this.localPerson = person;
+    personDao = new PersonDao(AdditionalUtils.getFactory(VaadinSession.getCurrent()).createEntityManager());
 
-    setWidth(1100,Unit.PIXELS);
+    setWidth(1400,Unit.PIXELS);
     setHeightUndefined();
     setModal(true);
     setResizable(false);
@@ -72,22 +76,22 @@ public class PersonWindow extends Window {
                             //Button search
                             btnSearch.setStyleName(ValoTheme.BUTTON_FRIENDLY);
                             btnSearch.setWidth(100, Unit.PERCENTAGE);
+                            btnSearch.addClickListener(new Button.ClickListener() {
+                                @Override
+                                public void buttonClick(Button.ClickEvent clickEvent) {
+                                    personList = personDao.findPersonsFromLikeFio(tfFio.getValue());
+                                    if (personList.isEmpty()) Notification.show("Нет результатов", Notification.Type.WARNING_MESSAGE);
+                                    grid.setItems(personList);
+                                }
+                            });
                         //Grid
                         grid.setWidth(100, Unit.PERCENTAGE);
                         grid.setRowHeight(40d);
                         grid.setHeightUndefined();
                         grid.setColumnReorderingAllowed(true);
-                        //                    grid.addColumn(Certificate::getId).setCaption("Код").setWidth(100d).setHidable(true);
-                        //                    grid.addColumn(Certificate::getSeries).setCaption("Серия").setWidth(150d);
-                        //                    grid.addColumn(Certificate::getNumber).setCaption("Номер").setWidth(150d);
-                        //                    grid.addColumn(Certificate::getFio).setCaption("ФИО");
-                        //                    grid.addColumn(Certificate::getCertificateDate).setCaption("Дата выдачи").setWidth(150d);
-                        //                    grid.addComponentColumn(certificate -> {
-                        //                        return certificate.getBtnEdit();
-                        //                    }).setCaption("Ред-ть").setWidth(100d);
-                        //                    grid.addComponentColumn(certificate -> {
-                        //                        return certificate.getBtnPrint();
-                        //                    }).setCaption("Печать").setWidth(100d);
+                        grid.addColumn(Person::getFio).setCaption("Ф.И.О.");
+                        grid.addColumn(Person::getBirthDateForGrid).setCaption("Дата рожд.").setWidth(140d);
+                        grid.addColumn(Person::getPassport).setCaption("Документ").setWidth(160d);
                 //Panel person
                 Panel panelPerson = new Panel("Страхователь");
                     panelPerson.setWidth(100, Unit.PERCENTAGE);
@@ -131,7 +135,7 @@ public class PersonWindow extends Window {
                             hlPassport.setSpacing(true);
                             //Df birth date
                             dfBirthDate.setPlaceholder("Дата рожд.");
-                            dfBirthDate.setWidth(160, Unit.PIXELS);
+                            dfBirthDate.setWidth(100, Unit.PERCENTAGE);
                             dfBirthDate.addStyleName("lable-group-caption");
                             dfBirthDate.setDateFormat("dd.MM.yyyy");
                             dfBirthDate.setParseErrorMessage("Неверный формат даты");

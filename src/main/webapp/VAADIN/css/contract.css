@@ -62,3 +62,18 @@
     color: #2f2357 !important;
     font-weight: bold !important;
 }
+
+.v-grid-row td{
+    background-color: rgba(71, 140, 255, 0.08) !important;
+    cursor: pointer;
+}
+
+.v-grid-row-stripe td{
+    background-color: rgba(232, 200, 20, 0.02) !important;
+    cursor: pointer;
+}
+
+.v-grid-header{
+    color: #1e2ca0 !important;
+    font-weight: bold !important;
+}

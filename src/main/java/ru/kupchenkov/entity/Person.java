@@ -4,6 +4,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -101,5 +103,13 @@ public class Person {
 
     public String getFio() {
         return lastName + " " + firstName + " " + middleName;
+    }
+
+    public String getPassport() {
+        return documentSeries + " " + documentNumber;
+    }
+
+    public String getBirthDateForGrid() {
+        return new SimpleDateFormat("dd.MM.yyyy").format(birthDate);
     }
 }

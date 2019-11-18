@@ -1,13 +1,22 @@
 package ru.kupchenkov.view.user.window;
 
+import com.vaadin.data.HasValue;
+import com.vaadin.event.FieldEvents;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import ru.kupchenkov.additional.AdditionalUtils;
+import ru.kupchenkov.dao.RealtyTypeDao;
+import ru.kupchenkov.entity.Contract;
 import ru.kupchenkov.entity.Person;
 import ru.kupchenkov.entity.RealtyType;
 import ru.kupchenkov.resource.Images;
+import ru.kupchenkov.service.CalculateService;
 
+import javax.persistence.EntityManager;
 import java.time.LocalDate;
+import java.time.Period;
+import java.util.Arrays;
 
 public class ContractWindow extends Window {
 
@@ -41,8 +50,12 @@ public class ContractWindow extends Window {
     private Button btnSave = new Button("Сохранить", Images.icoSave);
     private Button btnBack = new Button("К списку договоров", Images.icoList);
     private TextArea taComment = new TextArea("Комментарий к договору(не печатается на полисе)");
+    private RealtyTypeDao realtyTypeDao;
+    private EntityManager manager;
 
-    public ContractWindow() {
+    public ContractWindow(Contract contract) {
+        manager = AdditionalUtils.getFactory(VaadinSession.getCurrent()).createEntityManager();
+        realtyTypeDao = new RealtyTypeDao(manager);
 
         setWidth(1100, Unit.PIXELS);
         setHeightUndefined();
@@ -91,21 +104,48 @@ public class ContractWindow extends Window {
                                 tfInsuranceSum.setRequiredIndicatorVisible(true);
                                 tfInsuranceSum.addStyleName("lable-tf-caption");
                                 tfInsuranceSum.setPlaceholder("Укажите страховую сумму");
+                                tfInsuranceSum.addValueChangeListener(new HasValue.ValueChangeListener<String>() {
+                                    @Override
+                                    public void valueChange(HasValue.ValueChangeEvent<String> event) {
+                                        clearCalculate();
+                                    }
+                                });
                                 //Combobox realty type
                                 cbRealtyType.setWidth(100, Unit.PERCENTAGE);
                                 cbRealtyType.setPlaceholder("Укажите тип недвижимости");
                                 cbRealtyType.setRequiredIndicatorVisible(true);
                                 cbRealtyType.addStyleName("lable-group-caption");
+                                cbRealtyType.setItems(realtyTypeDao.getAll());
+                                cbRealtyType.addValueChangeListener(new HasValue.ValueChangeListener<RealtyType>() {
+                                    @Override
+                                    public void valueChange(HasValue.ValueChangeEvent<RealtyType> event) {
+                                        clearCalculate();
+                                    }
+                                });
                                 //Combobox build year
                                 cbBuildYear.setWidth(100, Unit.PERCENTAGE);
                                 cbBuildYear.setPlaceholder("Укажите год постройки");
                                 cbBuildYear.setRequiredIndicatorVisible(true);
                                 cbBuildYear.addStyleName("lable-group-caption");
+                                cbBuildYear.setItems(AdditionalUtils.getListYearToCurent());
+                                cbBuildYear.addValueChangeListener(new HasValue.ValueChangeListener<Integer>() {
+                                    @Override
+                                    public void valueChange(HasValue.ValueChangeEvent<Integer> event) {
+                                        clearCalculate();
+                                    }
+                                });
                                 //Tf build area
                                 tfBuildArea.setWidth(100, Unit.PERCENTAGE);
                                 tfBuildArea.setRequiredIndicatorVisible(true);
                                 tfBuildArea.addStyleName("lable-tf-caption");
                                 tfBuildArea.setPlaceholder("Укажите площадь");
+                                tfBuildArea.addValueChangeListener(new HasValue.ValueChangeListener<String>() {
+                                    @Override
+                                    public void valueChange(HasValue.ValueChangeEvent<String> event) {
+                                        clearCalculate();
+                                        if (event.getValue().contains(",")) tfBuildArea.setValue(event.getValue().replace(",", "."));
+                                    }
+                                });
 
                             //Horisontal layout right calculate
                             HorizontalLayout hlRightCalculate = new HorizontalLayout();
@@ -121,6 +161,12 @@ public class ContractWindow extends Window {
                                 dfStartDate.setDateFormat("dd.MM.yyyy");
                                 dfStartDate.setParseErrorMessage("Неверный формат даты");
                                 dfStartDate.setRequiredIndicatorVisible(true);
+                                dfStartDate.addValueChangeListener(new HasValue.ValueChangeListener<LocalDate>() {
+                                    @Override
+                                    public void valueChange(HasValue.ValueChangeEvent<LocalDate> event) {
+                                        clearCalculate();
+                                    }
+                                });
                                 //End date
                                 dfEndDate.setWidth(100, Unit.PERCENTAGE);
                                 dfEndDate.setPlaceholder("Действует по");
@@ -129,6 +175,12 @@ public class ContractWindow extends Window {
                                 dfEndDate.setDateFormat("dd.MM.yyyy");
                                 dfEndDate.setParseErrorMessage("Неверный формат даты");
                                 dfEndDate.setRequiredIndicatorVisible(true);
+                                dfEndDate.addValueChangeListener(new HasValue.ValueChangeListener<LocalDate>() {
+                                    @Override
+                                    public void valueChange(HasValue.ValueChangeEvent<LocalDate> event) {
+                                        clearCalculate();
+                                    }
+                                });
                         //Horisontal layout calculate apply
                         HorizontalLayout hlCalculateApply = new HorizontalLayout();
                             hlCalculateApply.setWidth(100, Unit.PERCENTAGE);
@@ -137,6 +189,20 @@ public class ContractWindow extends Window {
                             hlCalculateApply.setSpacing(true);
                             //Button calculate
                             btnCalculate.setStyleName(ValoTheme.BUTTON_PRIMARY);
+                            btnCalculate.addClickListener(new Button.ClickListener() {
+                                @Override
+                                public void buttonClick(Button.ClickEvent event) {
+                                    if (getErrorsFromDataCalculate().isEmpty()) {
+                                        dfCalculateDate.setValue(LocalDate.now());
+                                        tfCalculateSum.setValue(String.valueOf(new CalculateService(AdditionalUtils.getFactory(VaadinSession.getCurrent()).createEntityManager(),
+                                                cbRealtyType.getValue(), cbBuildYear.getValue(), Double.valueOf(tfBuildArea.getValue().trim()),
+                                                Double.valueOf(tfInsuranceSum.getValue().trim()), AdditionalUtils.daysBetween(dfStartDate.getValue(), dfEndDate.getValue()))
+                                                .calculate()));
+                                    } else {
+                                        Notification.show(getErrorsFromDataCalculate(), Notification.Type.WARNING_MESSAGE);
+                                    }
+                                }
+                            });
                             //Horisontal layout calculate result
                             HorizontalLayout hlCalculateResult = new HorizontalLayout();
                                 hlCalculateResult.setWidth(100, Unit.PERCENTAGE);
@@ -144,11 +210,11 @@ public class ContractWindow extends Window {
                                 hlCalculateResult.setMargin(false);
                                 hlCalculateResult.setSpacing(true);
                                 //Df calculate date
-                                dfCalculateDate.setValue(LocalDate.now());
                                 dfCalculateDate.setEnabled(false);
                                 dfCalculateDate.addStyleName("lable-group-caption");
                                 //Tf calculate sum
                                 tfCalculateSum.addStyleName("lable-tf-caption");
+                                tfCalculateSum.setRequiredIndicatorVisible(true);
                 //Vertical layout window
                 VerticalLayout vlContract = new VerticalLayout();
                     vlContract.setWidth(100, Unit.PERCENTAGE);
@@ -165,6 +231,7 @@ public class ContractWindow extends Window {
                         tfContractNumber.addStyleName("lable-tf-caption");
                         tfContractNumber.setPlaceholder("№ договора");
                         tfContractNumber.setRequiredIndicatorVisible(true);
+                        tfContractNumber.setMaxLength(6);
                         //Contract date
                         dfContractDate.setPlaceholder("Дата заключения");
                         dfContractDate.addStyleName("lable-group-caption");
@@ -268,6 +335,14 @@ public class ContractWindow extends Window {
                         hlButons.setSpacing(true);
                         //Button save
                         btnSave.setStyleName(ValoTheme.BUTTON_PRIMARY);
+                        btnSave.addClickListener(new Button.ClickListener() {
+                            @Override
+                            public void buttonClick(Button.ClickEvent event) {
+                                if (checkContract()) {
+                                    Notification.show("Сохранено", Notification.Type.WARNING_MESSAGE);
+                                }
+                            }
+                        });
                         //Button back
                         btnBack.setStyleName(ValoTheme.BUTTON_FRIENDLY);
                     //Coment lable
@@ -279,6 +354,7 @@ public class ContractWindow extends Window {
                     taComment.addStyleName("lable-tf-caption");
                     taComment.setRows(2);
                     taComment.setWordWrap(true);
+                    taComment.setMaxLength(500);
 
 
 
@@ -366,5 +442,39 @@ public class ContractWindow extends Window {
             tfInsurerDocumentSeries.setValue(person.getDocumentSeries());
             tfInsurerDocumentNumber.setValue(String.valueOf(person.getDocumentNumber()));
         }
+    }
+
+    //Get errors from data calculate
+    private String getErrorsFromDataCalculate() {
+        String errors = "";
+        if (tfInsuranceSum.getValue().trim().isEmpty()|| !AdditionalUtils.isPositiveInteger(tfInsuranceSum.getValue().trim())) errors += "\n Некорректная страховая сумма";
+        if (cbRealtyType.getValue() == null) errors += "\n Не указан тип недвижимости";
+        if (dfStartDate.getValue() == null) errors += "\n Не заполнена дата действия с";
+        if (dfEndDate.getValue() == null) errors += "\n Не заполнена дата действия по";
+        if (dfStartDate.getValue().compareTo(LocalDate.now()) < 0 ) errors += "\n Дата действия с не может быть меньше текущей";
+        if (cbBuildYear.getValue() == null) errors += "\n Не заполнен год постройки";
+        if (Period.between(dfStartDate.getValue(), dfEndDate.getValue()).getYears() == 0 ||
+                (Period.between(dfStartDate.getValue(), dfEndDate.getValue()).getYears() == 1 &&
+                        Period.between(dfStartDate.getValue(), dfEndDate.getValue()).getMonths() == 0 &&
+                        Period.between(dfStartDate.getValue(), dfEndDate.getValue()).getDays() == 0)) {} else errors += "\n Дата действия по не может быть больше даты действия с более чем на год";
+        if (dfStartDate.getValue().compareTo(dfEndDate.getValue()) > 0 ) errors += "\n Дата действия по не может быть меньше даты действия с";
+        if (AdditionalUtils.isInteger(tfBuildArea.getValue().trim()) || (tfBuildArea.getValue().trim().matches("[0-9]\\d*?(\\.\\d{1,1})") && AdditionalUtils.isDouble(tfBuildArea.getValue().trim()))) {}
+        else errors += "\n Некорректно указана площадь (значение должно быть целым числом или числом с 1 знаком после запятой)";
+        return errors;
+    }
+
+    //Check data
+    private boolean checkContract() {
+        String errors = getErrorsFromDataCalculate();
+
+        if (errors.isEmpty()) return true;
+        Notification.show(errors, Notification.Type.WARNING_MESSAGE);
+        return false;
+    }
+
+    // Clear calculate
+    private void clearCalculate() {
+        dfCalculateDate.clear();
+        tfCalculateSum.clear();
     }
 }

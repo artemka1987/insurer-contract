@@ -144,7 +144,7 @@ public class PersonWindow extends Window {
                             tfPassportSeries.setWidth(100, Unit.PERCENTAGE);
                             tfPassportSeries.addStyleName("lable-tf-caption");
                             tfPassportSeries.setPlaceholder("Серия");
-                            tfPassportSeries.setMaxLength(5);
+                            tfPassportSeries.setMaxLength(4);
                             tfPassportSeries.setRequiredIndicatorVisible(true);
                             //Tf number
                             tfPassportNumber.setWidth(100, Unit.PERCENTAGE);
@@ -162,7 +162,7 @@ public class PersonWindow extends Window {
                                 if (tfFirstName.getValue().trim().length() == 0) errors += "\n Не заполнено имя";
                                 if (dfBirthDate.getValue() == null) errors += "\n Не заполнена дата рождения";
                                 if (tfPassportSeries.getValue().trim().length() == 0) errors += "\n Не заполнена серия паспорта";
-                                if (tfPassportSeries.getValue().trim().length() < 5) errors += "\n Некорректно заполнена серия паспорта";
+                                if (tfPassportSeries.getValue().trim().length() < 4) errors += "\n Некорректно заполнена серия паспорта";
                                 if (tfPassportNumber.getValue().trim().length() == 0) errors += "\n Не заполнен номер паспорта";
                                 if (tfPassportNumber.getValue().trim().length() < 6 || !AdditionalUtils.isInteger(tfPassportNumber.getValue())) errors += "\n Некорректно заполнен номер паспорта";
                                 if (errors.trim().length() == 0) {

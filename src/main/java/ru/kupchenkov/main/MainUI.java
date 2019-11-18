@@ -18,20 +18,19 @@ import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
-import org.apache.commons.codec.digest.DigestUtils;
+import ru.kupchenkov.dao.BuildAreaDao;
 import ru.kupchenkov.dao.BuildYearDao;
 import ru.kupchenkov.dao.RealtyTypeDao;
 import ru.kupchenkov.dao.UserDao;
+import ru.kupchenkov.entity.BuildArea;
 import ru.kupchenkov.entity.BuildYear;
 import ru.kupchenkov.entity.RealtyType;
 import ru.kupchenkov.entity.User;
 import ru.kupchenkov.security.DesEncrypter;
 import ru.kupchenkov.view.LoginView;
 
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 
 @Theme("valo")
@@ -45,7 +44,7 @@ public class MainUI extends UI {
     @Override
     protected void init(VaadinRequest vaadinRequest) {
 
-        factory = Persistence.createEntityManagerFactory("Mssql");
+        factory = Persistence.createEntityManagerFactory("Postgres");
         VaadinSession.getCurrent().setAttribute("factory", factory);
         manager = factory.createEntityManager();
 
@@ -65,6 +64,11 @@ public class MainUI extends UI {
             buildYearDao.save(new BuildYear(1900, 1999, 1.3d));
             buildYearDao.save(new BuildYear(2000, 2014, 1.6d));
             buildYearDao.save(new BuildYear(2015, LocalDate.now().getYear(), 2d));
+            // Add area
+            BuildAreaDao buildAreaDao = new BuildAreaDao(manager);
+            buildAreaDao.save(new BuildArea(0d, 49.9d, 1.2d));
+            buildAreaDao.save(new BuildArea(50d, 100d, 1.5d));
+            buildAreaDao.save(new BuildArea(100.1d, 1000000d, 2d));
             manager.getTransaction().commit();
         } catch (Exception e) {
             manager.getTransaction().rollback();

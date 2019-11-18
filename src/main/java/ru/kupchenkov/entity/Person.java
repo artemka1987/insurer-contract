@@ -27,7 +27,7 @@ public class Person {
     @Column(nullable = false)
     private Date birthDate;
 
-    @Column(nullable = false, length = 5)
+    @Column(nullable = false, length = 4)
     private String documentSeries;
 
     @Column(nullable = false)

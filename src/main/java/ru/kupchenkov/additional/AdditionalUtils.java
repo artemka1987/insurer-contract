@@ -48,6 +48,10 @@ public class AdditionalUtils {
        return LocalDate.parse( new SimpleDateFormat("yyyy-MM-dd").format(date) );
     }
 
+    public static Date localDateToDate(LocalDate localDate) {
+        return java.sql.Date.valueOf(localDate);
+    }
+
     public static List<Integer> getListYearToCurent() {
         List<Integer> list = new ArrayList<>();
         int endYear = 1900;

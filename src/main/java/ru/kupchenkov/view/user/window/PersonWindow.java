@@ -4,6 +4,7 @@ import com.vaadin.server.Page;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.*;
+import com.vaadin.ui.components.grid.ItemClickListener;
 import com.vaadin.ui.themes.ValoTheme;
 import ru.kupchenkov.additional.AdditionalUtils;
 import ru.kupchenkov.dao.PersonDao;
@@ -92,6 +93,19 @@ public class PersonWindow extends Window {
                         grid.addColumn(Person::getFio).setCaption("Ф.И.О.");
                         grid.addColumn(Person::getBirthDateForGrid).setCaption("Дата рожд.").setWidth(140d);
                         grid.addColumn(Person::getPassport).setCaption("Документ").setWidth(160d);
+                        grid.addItemClickListener(new ItemClickListener<Person>() {
+                            @Override
+                            public void itemClick(Grid.ItemClick<Person> event) {
+                                if (event.getMouseEventDetails().isDoubleClick()) {
+                                    Notification notification = new Notification("Страхователь выбран");
+                                    notification.setPosition(Position.TOP_RIGHT);
+                                    notification.show(Page.getCurrent());
+                                    contractWindow.setPersonInfo(event.getItem());
+                                    contractWindow.person = event.getItem();
+                                    close();
+                                }
+                            }
+                        });
                 //Panel person
                 Panel panelPerson = new Panel("Страхователь");
                     panelPerson.setWidth(100, Unit.PERCENTAGE);
@@ -179,6 +193,7 @@ public class PersonWindow extends Window {
                                         notification.setPosition(Position.TOP_RIGHT);
                                         notification.show(Page.getCurrent());
                                         contractWindow.setPersonInfo(localPerson);
+                                        contractWindow.person = localPerson;
                                         close();
                                     } catch (Exception e) {
                                         manager.getTransaction().rollback();
@@ -217,5 +232,15 @@ public class PersonWindow extends Window {
         hlSearchParams.setExpandRatio(btnSearch, 1f);
         hlSearchParams.setComponentAlignment(btnSearch, Alignment.BOTTOM_LEFT);
         vlPerson.setComponentAlignment(btnSave, Alignment.MIDDLE_RIGHT);
+
+        ////////////////////////////////////////////// Set values fr edit //////////////////////////////////////////////
+        if (person != null) {
+            tfLastName.setValue(person.getLastName());
+            tfFirstName.setValue(person.getFirstName());
+            tfMiddleName.setValue(person.getMiddleName());
+            dfBirthDate.setValue(AdditionalUtils.dateToLocalDate(person.getBirthDate()));
+            tfPassportSeries.setValue(person.getDocumentSeries());
+            tfPassportNumber.setValue(String.valueOf(person.getDocumentNumber()));
+        }
     }
 }

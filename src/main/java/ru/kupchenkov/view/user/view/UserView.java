@@ -91,7 +91,7 @@ public class UserView extends VerticalLayout implements View {
                                 btnNew.addClickListener(new Button.ClickListener() {
                                     @Override
                                     public void buttonClick(Button.ClickEvent clickEvent) {
-                                        getUI().addWindow(new ContractWindow(null));
+                                        getUI().addWindow(new ContractWindow(null, user));
                                     }
                                 });
                                 //Button edit

@@ -6,17 +6,21 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import ru.kupchenkov.additional.AdditionalUtils;
+import ru.kupchenkov.dao.BuildYearDao;
+import ru.kupchenkov.dao.ContractDao;
+import ru.kupchenkov.dao.RealtyDao;
 import ru.kupchenkov.dao.RealtyTypeDao;
-import ru.kupchenkov.entity.Contract;
-import ru.kupchenkov.entity.Person;
-import ru.kupchenkov.entity.RealtyType;
+import ru.kupchenkov.entity.*;
+import ru.kupchenkov.entity.embeded.AddressEmbeded;
 import ru.kupchenkov.resource.Images;
 import ru.kupchenkov.service.CalculateService;
 
+import javax.persistence.Cache;
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Arrays;
+import java.util.Calendar;
 
 public class ContractWindow extends Window {
 
@@ -37,7 +41,7 @@ public class ContractWindow extends Window {
     private DateField dfInsurerBirthdate = new DateField("Дата рождения");
     private TextField tfInsurerDocumentSeries = new TextField("Серия паспорта");
     private TextField tfInsurerDocumentNumber = new TextField("Номер паспорта");
-    private ComboBox<String> cbCountry = new ComboBox<>("Страна");
+    private TextField tfCountry = new TextField("Страна");
     private TextField tfZipCode = new TextField("Индекс");
     private TextField tfRegion = new TextField("Республика, край, область");
     private TextField tfDistrict = new TextField("Район");
@@ -52,8 +56,9 @@ public class ContractWindow extends Window {
     private TextArea taComment = new TextArea("Комментарий к договору(не печатается на полисе)");
     private RealtyTypeDao realtyTypeDao;
     private EntityManager manager;
+    public Person person;
 
-    public ContractWindow(Contract contract) {
+    public ContractWindow(Contract contract, User user) {
         manager = AdditionalUtils.getFactory(VaadinSession.getCurrent()).createEntityManager();
         realtyTypeDao = new RealtyTypeDao(manager);
 
@@ -238,7 +243,7 @@ public class ContractWindow extends Window {
                         dfContractDate.setValue(LocalDate.now());
                         dfContractDate.setDateFormat("dd.MM.yyyy");
                         dfContractDate.setParseErrorMessage("Неверный формат даты");
-                        dfContractDate.setRequiredIndicatorVisible(true);
+                        dfContractDate.setEnabled(false);
                     //Insurer lable
                     Label labelInsurer = new Label("СТРАХОВАТЕЛЬ");
                         labelInsurer.addStyleName("lable-l-caption");
@@ -264,6 +269,12 @@ public class ContractWindow extends Window {
                         //Button insurer edit
                         btnInsurerEdit.setStyleName(ValoTheme.BUTTON_FRIENDLY);
                         btnInsurerEdit.setWidth(100, Unit.PERCENTAGE);
+                        btnInsurerEdit.addClickListener(new Button.ClickListener() {
+                            @Override
+                            public void buttonClick(Button.ClickEvent event) {
+                                getUI().addWindow(new PersonWindow(person, ContractWindow.this));
+                            }
+                        });
                     //Horisontal layout insurer birthdate
                     HorizontalLayout hlInsurerBirthdate = new HorizontalLayout();
                         hlInsurerBirthdate.setWidth(100, Unit.PERCENTAGE);
@@ -290,16 +301,18 @@ public class ContractWindow extends Window {
                         hlAddress.setHeightUndefined();
                         hlAddress.setMargin(false);
                         hlAddress.setSpacing(true);
-                        //Combobox country
-                        cbCountry.setWidth(100, Unit.PERCENTAGE);
-                        cbCountry.setRequiredIndicatorVisible(true);
-                        cbCountry.addStyleName("lable-group-caption");
+                        //Tf country
+                        tfCountry.setWidth(100, Unit.PERCENTAGE);
+                        tfCountry.setRequiredIndicatorVisible(true);
+                        tfCountry.addStyleName("lable-tf-caption");
                         //Tf zip code
                         tfZipCode.setWidth(100, Unit.PERCENTAGE);
                         tfZipCode.addStyleName("lable-tf-caption");
+                        tfZipCode.setMaxLength(6);
                         //Tf region
                         tfRegion.setWidth(100, Unit.PERCENTAGE);
                         tfRegion.addStyleName("lable-tf-caption");
+                        tfRegion.setRequiredIndicatorVisible(true);
                         //Tf district
                         tfDistrict.setWidth(100, Unit.PERCENTAGE);
                         tfDistrict.addStyleName("lable-tf-caption");
@@ -312,9 +325,11 @@ public class ContractWindow extends Window {
                         //Tf city
                         tfCity.setWidth(100, Unit.PERCENTAGE);
                         tfCity.addStyleName("lable-tf-caption");
+                        tfCity.setRequiredIndicatorVisible(true);
                         //Tf street
                         tfStreet.setWidth(100, Unit.PERCENTAGE);
                         tfStreet.addStyleName("lable-tf-caption");
+                        tfStreet.setRequiredIndicatorVisible(true);
                         //Tf house
                         tfHouse.setWidth(100, Unit.PERCENTAGE);
                         tfHouse.addStyleName("lable-tf-caption");
@@ -327,6 +342,7 @@ public class ContractWindow extends Window {
                         //Tf flat
                         tfFlat.setWidth(100, Unit.PERCENTAGE);
                         tfFlat.addStyleName("lable-tf-caption");
+                        tfFlat.setRequiredIndicatorVisible(true);
                     //Horisontal layout buttons
                     HorizontalLayout hlButons = new HorizontalLayout();
                         hlButons.setWidthUndefined();
@@ -339,7 +355,50 @@ public class ContractWindow extends Window {
                             @Override
                             public void buttonClick(Button.ClickEvent event) {
                                 if (checkContract()) {
-                                    Notification.show("Сохранено", Notification.Type.WARNING_MESSAGE);
+                                    ContractDao contractDao = new ContractDao(manager);
+                                    BuildYearDao buildYearDao = new BuildYearDao(manager);
+                                    RealtyDao realtyDao = new RealtyDao(manager);
+                                    manager.getTransaction().begin();
+                                    try {
+                                        AddressEmbeded addressEmbeded = new AddressEmbeded(tfCountry.getValue().trim(),
+                                                tfZipCode.getValue().trim(),
+                                                tfRegion.getValue().trim(),
+                                                tfDistrict.getValue().trim(),
+                                                tfCity.getValue().trim(),
+                                                tfStreet.getValue().trim(),
+                                                tfHouse.getValue().trim(),
+                                                tfBuilding.getValue().trim(),
+                                                tfBuilding2.getValue().trim(),
+                                                tfFlat.getValue().trim());
+                                        Realty realty = new Realty(cbRealtyType.getValue(),
+                                                buildYearDao.findByYear(cbBuildYear.getValue()),
+                                                Double.valueOf(tfBuildArea.getValue().trim()),
+                                                addressEmbeded,
+                                                Double.valueOf(tfInsuranceSum.getValue().trim()),
+                                                AdditionalUtils.localDateToDate(dfStartDate.getValue()),
+                                                AdditionalUtils.localDateToDate(dfEndDate.getValue()),
+                                                user,
+                                                Calendar.getInstance()
+                                        );
+                                        realtyDao.save(realty);
+                                        Contract saveContract = new Contract(realty,
+                                                person,
+                                                Integer.valueOf(tfContractNumber.getValue().trim()),
+                                                AdditionalUtils.localDateToDate(dfContractDate.getValue()),
+                                                AdditionalUtils.localDateToDate(dfStartDate.getValue()),
+                                                AdditionalUtils.localDateToDate(dfEndDate.getValue()),
+                                                AdditionalUtils.localDateToDate(dfCalculateDate.getValue()),
+                                                Double.valueOf(tfCalculateSum.getValue().trim()),
+                                                taComment.getValue().trim()
+                                        );
+                                        contractDao.save(saveContract);
+                                        manager.getTransaction().commit();
+                                        Notification.show("Договор сохранен", Notification.Type.WARNING_MESSAGE);
+                                        close();
+                                    } catch (Exception e) {
+                                        manager.getTransaction().rollback();
+                                        Notification.show("Ошибка сохранения договора: " + e.getMessage(), Notification.Type.ERROR_MESSAGE);
+                                    }
                                 }
                             }
                         });
@@ -392,7 +451,7 @@ public class ContractWindow extends Window {
                         hlInsurerBirthdate.addComponent(tfInsurerDocumentNumber);
                     vlContract.addComponent(labelAddress);
                     vlContract.addComponent(hlAddress);
-                        hlAddress.addComponent(cbCountry);
+                        hlAddress.addComponent(tfCountry);
                         hlAddress.addComponent(tfZipCode);
                         hlAddress.addComponent(tfRegion);
                         hlAddress.addComponent(tfDistrict);
@@ -420,7 +479,7 @@ public class ContractWindow extends Window {
         hlInsurerFio.setComponentAlignment(btnInsurerEdit, Alignment.BOTTOM_RIGHT);
         hlInsurerBirthdate.setComponentAlignment(tfInsurerDocumentSeries, Alignment.MIDDLE_CENTER);
         hlInsurerBirthdate.setComponentAlignment(tfInsurerDocumentNumber, Alignment.MIDDLE_RIGHT);
-        hlAddress.setExpandRatio(cbCountry, 1.5f);
+        hlAddress.setExpandRatio(tfCountry, 1.5f);
         hlAddress.setExpandRatio(tfZipCode, 1f);
         hlAddress.setExpandRatio(tfRegion, 3f);
         hlAddress.setExpandRatio(tfDistrict, 3f);
@@ -466,6 +525,14 @@ public class ContractWindow extends Window {
     //Check data
     private boolean checkContract() {
         String errors = getErrorsFromDataCalculate();
+        if (tfContractNumber.getValue().trim().length() != 6 || !AdditionalUtils.isPositiveInteger(tfContractNumber.getValue().trim())) errors += "\n Некорректно указан номер договора";
+        if (person == null) errors += "\n Не выбран страхователь";
+        if (tfCalculateSum.getValue().trim().isEmpty()) errors += "\n Не произведен рассчет страховой премии";
+        if (tfCountry.getValue().trim().isEmpty()) errors += "\n Не заполнена страна";
+        if (tfRegion.getValue().trim().isEmpty()) errors += "\n Не заполнен регион";
+        if (tfCity.getValue().trim().isEmpty()) errors += "\n Не заполнен населенный пункт";
+        if (tfStreet.getValue().trim().isEmpty()) errors += "\n Не заполнена улица";
+        if (tfFlat.getValue().trim().isEmpty()) errors += "\n Не заполнена квартира";
 
         if (errors.isEmpty()) return true;
         Notification.show(errors, Notification.Type.WARNING_MESSAGE);

@@ -35,9 +35,6 @@ public class Contract {
     @Column(nullable = false)
     private double calculateSum;
 
-    @Column(nullable = false)
-    private double insurerSum;
-
     @Column(length = 500)
     private String comment;
 

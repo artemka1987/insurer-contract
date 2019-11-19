@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
-@Cacheable(false)
 public class Person {
 
     @Id

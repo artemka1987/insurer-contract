@@ -273,7 +273,9 @@ public class ContractWindow extends Window {
                         btnInsurerEdit.addClickListener(new Button.ClickListener() {
                             @Override
                             public void buttonClick(Button.ClickEvent event) {
-                                getUI().addWindow(new PersonWindow(person, ContractWindow.this));
+                                if (person != null) {
+                                    getUI().addWindow(new PersonWindow(person, ContractWindow.this));
+                                } else Notification.show("Страхователь не выбран", Notification.Type.WARNING_MESSAGE);
                             }
                         });
                     //Horisontal layout insurer birthdate
@@ -433,6 +435,7 @@ public class ContractWindow extends Window {
                                         contractDao.save(saveContract);
                                         manager.getTransaction().commit();
                                         Notification.show("Договор сохранен", Notification.Type.WARNING_MESSAGE);
+                                        userView.btnSearch.click();
                                         close();
                                     } catch (Exception e) {
                                         manager.getTransaction().rollback();
@@ -446,7 +449,6 @@ public class ContractWindow extends Window {
                         btnBack.addClickListener(new Button.ClickListener() {
                             @Override
                             public void buttonClick(Button.ClickEvent event) {
-                                userView.btnSearch.click();
                                 close();
                             }
                         });

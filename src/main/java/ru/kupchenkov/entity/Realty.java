@@ -8,7 +8,6 @@ import java.util.Date;
 
 @Entity
 @Table
-@Cacheable(false)
 public class Realty {
 
     @Id

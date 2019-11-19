@@ -31,9 +31,6 @@ public class UserView extends VerticalLayout implements View {
 
     public UserView(User user) {
 
-        EntityManager manager = AdditionalUtils.getFactory(VaadinSession.getCurrent()).createEntityManager();
-        ContractDao contractDao = new ContractDao(manager);
-
         setSizeFull();
         setMargin(false);
 
@@ -81,7 +78,7 @@ public class UserView extends VerticalLayout implements View {
                                     btnSearch.addClickListener(new Button.ClickListener() {
                                         @Override
                                         public void buttonClick(Button.ClickEvent clickEvent) {
-                                            AdditionalUtils.getFactory(VaadinSession.getCurrent()).getCache().evictAll();
+                                            ContractDao contractDao = new ContractDao(AdditionalUtils.getFactory(VaadinSession.getCurrent()).createEntityManager());
                                             contractList.clear();
                                             if (AdditionalUtils.isPositiveInteger(tfNumber.getValue().trim())) {
                                                 Contract found = contractDao.findByNumber(Integer.valueOf(tfNumber.getValue().trim()));

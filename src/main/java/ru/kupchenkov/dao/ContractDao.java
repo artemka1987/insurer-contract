@@ -1,7 +1,6 @@
 package ru.kupchenkov.dao;
 
 import ru.kupchenkov.entity.Contract;
-
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import java.util.List;
@@ -31,7 +30,12 @@ public class ContractDao {
     }
 
     public List<Contract> findByInsurerFio(String fio) {
+        manager.getEntityManagerFactory().getCache().evictAll();
         return manager.createQuery("from Contract where upper(concat(person.lastName, ' ', person.firstName, ' ', person.middleName)) like :fio", Contract.class)
                 .setParameter("fio", fio.trim().toUpperCase().replaceAll(" ","%") + "%").getResultList();
+    }
+
+    public List<Contract> getAll() {
+        return manager.createQuery("from Contract ").getResultList();
     }
 }

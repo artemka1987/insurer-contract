@@ -14,6 +14,7 @@ import ru.kupchenkov.entity.*;
 import ru.kupchenkov.entity.embeded.AddressEmbeded;
 import ru.kupchenkov.resource.Images;
 import ru.kupchenkov.service.CalculateService;
+import ru.kupchenkov.view.user.view.UserView;
 
 import javax.persistence.Cache;
 import javax.persistence.EntityManager;
@@ -58,7 +59,7 @@ public class ContractWindow extends Window {
     private EntityManager manager;
     public Person person;
 
-    public ContractWindow(Contract contract, User user) {
+    public ContractWindow(Contract contract, User user, UserView userView) {
         manager = AdditionalUtils.getFactory(VaadinSession.getCurrent()).createEntityManager();
         realtyTypeDao = new RealtyTypeDao(manager);
 
@@ -358,39 +359,77 @@ public class ContractWindow extends Window {
                                     ContractDao contractDao = new ContractDao(manager);
                                     BuildYearDao buildYearDao = new BuildYearDao(manager);
                                     RealtyDao realtyDao = new RealtyDao(manager);
+                                    Contract saveContract;
                                     manager.getTransaction().begin();
                                     try {
-                                        AddressEmbeded addressEmbeded = new AddressEmbeded(tfCountry.getValue().trim(),
-                                                tfZipCode.getValue().trim(),
-                                                tfRegion.getValue().trim(),
-                                                tfDistrict.getValue().trim(),
-                                                tfCity.getValue().trim(),
-                                                tfStreet.getValue().trim(),
-                                                tfHouse.getValue().trim(),
-                                                tfBuilding.getValue().trim(),
-                                                tfBuilding2.getValue().trim(),
-                                                tfFlat.getValue().trim());
-                                        Realty realty = new Realty(cbRealtyType.getValue(),
-                                                buildYearDao.findByYear(cbBuildYear.getValue()),
-                                                Double.valueOf(tfBuildArea.getValue().trim()),
-                                                addressEmbeded,
-                                                Double.valueOf(tfInsuranceSum.getValue().trim()),
-                                                AdditionalUtils.localDateToDate(dfStartDate.getValue()),
-                                                AdditionalUtils.localDateToDate(dfEndDate.getValue()),
-                                                user,
-                                                Calendar.getInstance()
-                                        );
-                                        realtyDao.save(realty);
-                                        Contract saveContract = new Contract(realty,
-                                                person,
-                                                Integer.valueOf(tfContractNumber.getValue().trim()),
-                                                AdditionalUtils.localDateToDate(dfContractDate.getValue()),
-                                                AdditionalUtils.localDateToDate(dfStartDate.getValue()),
-                                                AdditionalUtils.localDateToDate(dfEndDate.getValue()),
-                                                AdditionalUtils.localDateToDate(dfCalculateDate.getValue()),
-                                                Double.valueOf(tfCalculateSum.getValue().trim()),
-                                                taComment.getValue().trim()
-                                        );
+                                        if (contract == null) {
+                                            AddressEmbeded addressEmbeded = new AddressEmbeded(tfCountry.getValue().trim(),
+                                                    tfZipCode.getValue().trim(),
+                                                    tfRegion.getValue().trim(),
+                                                    tfDistrict.getValue().trim(),
+                                                    tfCity.getValue().trim(),
+                                                    tfStreet.getValue().trim(),
+                                                    tfHouse.getValue().trim(),
+                                                    tfBuilding.getValue().trim(),
+                                                    tfBuilding2.getValue().trim(),
+                                                    tfFlat.getValue().trim());
+                                            Realty realty = new Realty(cbRealtyType.getValue(),
+                                                    buildYearDao.findByYear(cbBuildYear.getValue()),
+                                                    Double.valueOf(tfBuildArea.getValue().trim()),
+                                                    addressEmbeded,
+                                                    Integer.valueOf(tfInsuranceSum.getValue().trim()),
+                                                    AdditionalUtils.localDateToDate(dfStartDate.getValue()),
+                                                    AdditionalUtils.localDateToDate(dfEndDate.getValue()),
+                                                    user,
+                                                    Calendar.getInstance(),
+                                                    cbBuildYear.getValue()
+                                            );
+                                            realtyDao.save(realty);
+                                            saveContract = new Contract(realty,
+                                                    person,
+                                                    Integer.valueOf(tfContractNumber.getValue().trim()),
+                                                    AdditionalUtils.localDateToDate(dfContractDate.getValue()),
+                                                    AdditionalUtils.localDateToDate(dfStartDate.getValue()),
+                                                    AdditionalUtils.localDateToDate(dfEndDate.getValue()),
+                                                    AdditionalUtils.localDateToDate(dfCalculateDate.getValue()),
+                                                    Double.valueOf(tfCalculateSum.getValue().trim()),
+                                                    taComment.getValue().trim()
+                                            );
+                                        } else {
+                                            AddressEmbeded addressEmbeded = contract.getRealty().getAddress();
+                                                addressEmbeded.setCountry(tfCountry.getValue().trim());
+                                                addressEmbeded.setZipCode(tfZipCode.getValue().trim());
+                                                addressEmbeded.setRegion(tfRegion.getValue().trim());
+                                                addressEmbeded.setDistrict(tfDistrict.getValue().trim());
+                                                addressEmbeded.setCity(tfCity.getValue().trim());
+                                                addressEmbeded.setStreet(tfStreet.getValue().trim());
+                                                addressEmbeded.setHouse(tfHouse.getValue().trim());
+                                                addressEmbeded.setBuilding(tfBuilding.getValue().trim());
+                                                addressEmbeded.setBuilding2(tfBuilding2.getValue().trim());
+                                                addressEmbeded.setFlat(tfFlat.getValue().trim());
+                                            Realty realty = realtyDao.findById(contract.getRealty().getId());
+                                                realty.setAddress(addressEmbeded);
+                                                realty.setBuildYear(buildYearDao.findByYear(cbBuildYear.getValue()));
+                                                realty.setArea(Double.valueOf(tfBuildArea.getValue().trim()));
+                                                realty.setRealtyType(cbRealtyType.getValue());
+                                                realty.setInsurerSum(Integer.valueOf(tfInsuranceSum.getValue().trim()));
+                                                realty.setStartDate(AdditionalUtils.localDateToDate(dfStartDate.getValue()));
+                                                realty.setEndDate(AdditionalUtils.localDateToDate(dfEndDate.getValue()));
+                                                realty.setUserModify(user);
+                                                realty.setDateModify(Calendar.getInstance());
+                                                realty.setYear(cbBuildYear.getValue());
+                                            realtyDao.save(realty);
+                                                saveContract = contractDao.findById(contract.getId());
+                                                saveContract.setRealty(realty);
+                                                saveContract.setPerson(person);
+                                                saveContract.setNumber(Integer.valueOf(tfContractNumber.getValue().trim()));
+                                                saveContract.setDate(AdditionalUtils.localDateToDate(dfContractDate.getValue()));
+                                                saveContract.setStartDate(AdditionalUtils.localDateToDate(dfStartDate.getValue()));
+                                                saveContract.setEndDate(AdditionalUtils.localDateToDate(dfEndDate.getValue()));
+                                                saveContract.setCalculateDate(AdditionalUtils.localDateToDate(dfCalculateDate.getValue()));
+                                                saveContract.setCalculateSum(Double.valueOf(tfCalculateSum.getValue().trim()));
+                                                saveContract.setComment(taComment.getValue().trim());
+                                        }
                                         contractDao.save(saveContract);
                                         manager.getTransaction().commit();
                                         Notification.show("Договор сохранен", Notification.Type.WARNING_MESSAGE);
@@ -404,6 +443,13 @@ public class ContractWindow extends Window {
                         });
                         //Button back
                         btnBack.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+                        btnBack.addClickListener(new Button.ClickListener() {
+                            @Override
+                            public void buttonClick(Button.ClickEvent event) {
+                                userView.btnSearch.click();
+                                close();
+                            }
+                        });
                     //Coment lable
                     Label labelComment = new Label("КОММЕНТАРИЙ");
                         labelComment.addStyleName("lable-l-caption");
@@ -490,6 +536,36 @@ public class ContractWindow extends Window {
         hlAddress2.setExpandRatio(tfBuilding2, 0.65f);
         hlAddress2.setExpandRatio(tfFlat, 0.65f);
         vlContract.setComponentAlignment(hlButons, Alignment.BOTTOM_CENTER);
+
+        //////////////////////////////////////// Set values ////////////////////////////////////////////////////////////
+        if (contract != null) {
+            tfInsuranceSum.setValue(String.valueOf(contract.getRealty().getInsurerSum()));
+            cbRealtyType.setValue(contract.getRealty().getRealtyType());
+            cbBuildYear.setValue(contract.getRealty().getYear());
+            tfBuildArea.setValue(String.valueOf(contract.getRealty().getArea()));
+            dfStartDate.setValue(AdditionalUtils.dateToLocalDate(contract.getStartDate()));
+            dfEndDate.setValue(AdditionalUtils.dateToLocalDate(contract.getEndDate()));
+            dfCalculateDate.setValue(AdditionalUtils.dateToLocalDate(contract.getCalculateDate()));
+            tfCalculateSum.setValue(String.valueOf(contract.getCalculateSum()));
+            tfContractNumber.setValue(String.valueOf(contract.getNumber()));
+            dfContractDate.setValue(AdditionalUtils.dateToLocalDate(contract.getDate()));
+            person = contract.getPerson();
+            tfInsurerFio.setValue(person.getFio());
+            dfInsurerBirthdate.setValue(AdditionalUtils.dateToLocalDate(person.getBirthDate()));
+            tfInsurerDocumentSeries.setValue(person.getDocumentSeries());
+            tfInsurerDocumentNumber.setValue(String.valueOf(person.getDocumentNumber()));
+            tfCountry.setValue(contract.getRealty().getAddress().getCountry());
+            tfZipCode.setValue(contract.getRealty().getAddress().getZipCode());
+            tfRegion.setValue(contract.getRealty().getAddress().getRegion());
+            tfDistrict.setValue(contract.getRealty().getAddress().getDistrict());
+            tfCity.setValue(contract.getRealty().getAddress().getCity());
+            tfStreet.setValue(contract.getRealty().getAddress().getStreet());
+            tfHouse.setValue(contract.getRealty().getAddress().getHouse());
+            tfBuilding.setValue(contract.getRealty().getAddress().getBuilding());
+            tfBuilding2.setValue(contract.getRealty().getAddress().getBuilding2());
+            tfFlat.setValue(contract.getRealty().getAddress().getFlat());
+            taComment.setValue(contract.getComment());
+        }
     }
 
 
@@ -533,7 +609,7 @@ public class ContractWindow extends Window {
         if (tfCity.getValue().trim().isEmpty()) errors += "\n Не заполнен населенный пункт";
         if (tfStreet.getValue().trim().isEmpty()) errors += "\n Не заполнена улица";
         if (tfFlat.getValue().trim().isEmpty()) errors += "\n Не заполнена квартира";
-
+        if (AdditionalUtils.yearsBetween(AdditionalUtils.dateToLocalDate(person.getBirthDate()), dfContractDate.getValue()) < 18) errors += "\n Страхователь не достиг совершеннолетия";
         if (errors.isEmpty()) return true;
         Notification.show(errors, Notification.Type.WARNING_MESSAGE);
         return false;

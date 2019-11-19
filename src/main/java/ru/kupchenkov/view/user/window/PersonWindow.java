@@ -184,9 +184,19 @@ public class PersonWindow extends Window {
                                     manager.getTransaction().begin();
                                     try {
                                         PersonDao personDao = new PersonDao(manager);
-                                        localPerson = new Person(tfLastName.getValue().trim(), tfFirstName.getValue().trim(),
-                                                tfMiddleName.getValue().trim(), Date.valueOf(dfBirthDate.getValue()),
-                                                tfPassportSeries.getValue(), Integer.valueOf(tfPassportNumber.getValue()));
+                                        if (person != null) {
+                                            localPerson = personDao.findById(person.getId());
+                                            localPerson.setLastName(tfLastName.getValue().trim());
+                                            localPerson.setFirstName(tfFirstName.getValue().trim());
+                                            localPerson.setMiddleName(tfMiddleName.getValue().trim());
+                                            localPerson.setBirthDate(AdditionalUtils.localDateToDate(dfBirthDate.getValue()));
+                                            localPerson.setDocumentSeries(tfPassportSeries.getValue().trim());
+                                            localPerson.setDocumentNumber(Integer.parseInt(tfPassportNumber.getValue().trim()));
+                                        } else {
+                                            localPerson = new Person(tfLastName.getValue().trim(), tfFirstName.getValue().trim(),
+                                                    tfMiddleName.getValue().trim(), Date.valueOf(dfBirthDate.getValue()),
+                                                    tfPassportSeries.getValue(), Integer.valueOf(tfPassportNumber.getValue()));
+                                        }
                                         personDao.save(localPerson);
                                         manager.getTransaction().commit();
                                         Notification notification = new Notification("Данные успешно сохранены");

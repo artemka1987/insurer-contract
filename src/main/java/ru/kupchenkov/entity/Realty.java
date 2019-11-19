@@ -8,6 +8,7 @@ import java.util.Date;
 
 @Entity
 @Table
+@Cacheable(false)
 public class Realty {
 
     @Id
@@ -21,13 +22,16 @@ public class Realty {
     private BuildYear buildYear;
 
     @Column(nullable = false)
+    private int year;
+
+    @Column(nullable = false)
     private double area;
 
     @Embedded
     private AddressEmbeded address;
 
     @Column(nullable = false)
-    private double insurerSum;
+    private int insurerSum;
 
     @Column(nullable = false)
     private Date startDate;
@@ -44,7 +48,7 @@ public class Realty {
     public Realty() {
     }
 
-    public Realty(RealtyType realtyType, BuildYear buildYear, double area, AddressEmbeded address, double insurerSum, Date startDate, Date endDate, User userModify, Calendar dateModify) {
+    public Realty(RealtyType realtyType, BuildYear buildYear, double area, AddressEmbeded address, int insurerSum, Date startDate, Date endDate, User userModify, Calendar dateModify, int year) {
         this.realtyType = realtyType;
         this.buildYear = buildYear;
         this.area = area;
@@ -54,6 +58,7 @@ public class Realty {
         this.endDate = endDate;
         this.userModify = userModify;
         this.dateModify = dateModify;
+        this.year = year;
     }
 
     public int getId() {
@@ -96,11 +101,11 @@ public class Realty {
         this.address = address;
     }
 
-    public double getInsurerSum() {
+    public int getInsurerSum() {
         return insurerSum;
     }
 
-    public void setInsurerSum(double insurerSum) {
+    public void setInsurerSum(int insurerSum) {
         this.insurerSum = insurerSum;
     }
 
@@ -134,5 +139,13 @@ public class Realty {
 
     public void setDateModify(Calendar dateModify) {
         this.dateModify = dateModify;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
     }
 }

@@ -22,4 +22,8 @@ public class PersonDao {
                 .setParameter("fio", fio.trim().toUpperCase().replaceAll(" ","%") + "%").getResultList();
     }
 
+    public Person findById(int id) {
+        return manager.find(Person.class, id);
+    }
+
 }

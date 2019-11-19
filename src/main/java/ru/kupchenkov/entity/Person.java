@@ -1,14 +1,12 @@
 package ru.kupchenkov.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
+@Cacheable(false)
 public class Person {
 
     @Id

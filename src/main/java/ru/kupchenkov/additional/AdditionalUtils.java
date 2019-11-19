@@ -64,4 +64,8 @@ public class AdditionalUtils {
     public static long daysBetween(LocalDate startDate, LocalDate endDate) {
         return ChronoUnit.DAYS.between(startDate, endDate);
     }
+
+    public static long yearsBetween(LocalDate startDate, LocalDate endDate) {
+        return ChronoUnit.YEARS.between(startDate, endDate);
+    }
 }

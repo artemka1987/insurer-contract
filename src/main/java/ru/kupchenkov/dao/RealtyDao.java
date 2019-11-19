@@ -16,4 +16,8 @@ public class RealtyDao {
         manager.persist(realty);
     }
 
+    public Realty findById(int id) {
+        return manager.find(Realty.class, id);
+    }
+
 }

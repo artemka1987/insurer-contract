@@ -1,10 +1,12 @@
 package ru.kupchenkov.entity;
 
 import javax.persistence.*;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Entity
 @Table
+@Cacheable(false)
 public class Contract {
 
     @Id
@@ -133,4 +135,17 @@ public class Contract {
     public void setComment(String comment) {
         this.comment = comment;
     }
+
+    public String getInsurer() {
+        return getPerson().getLastName() + " " + getPerson().getFirstName() + " " + getPerson().getMiddleName();
+    }
+
+    public String getDateForGrid() {
+        return new SimpleDateFormat("dd.MM.yyyy").format(date);
+    }
+
+    public String getPeriodInsurance() {
+        return new SimpleDateFormat("dd.MM.yyyy").format(startDate) + " - " + new SimpleDateFormat("dd.MM.yyyy").format(endDate);
+    }
+
 }

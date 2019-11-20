@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Base64;
 
 public class DesEncrypter {
 
@@ -23,11 +24,11 @@ public class DesEncrypter {
     public String encrypt(String str) throws UnsupportedEncodingException, IllegalBlockSizeException, BadPaddingException {
         byte[] utf8 = str.getBytes("UTF8");
         byte[] enc = ecipher.doFinal(utf8);
-        return new sun.misc.BASE64Encoder().encode(enc);
+        return new String(Base64.getEncoder().encode(enc));
     }
 
     public String decrypt(String str) throws IOException, IllegalBlockSizeException, BadPaddingException {
-        byte[] dec = new sun.misc.BASE64Decoder().decodeBuffer(str);
+        byte[] dec = Base64.getDecoder().decode(str);
         byte[] utf8 = dcipher.doFinal(dec);
         return new String(utf8, "UTF8");
     }

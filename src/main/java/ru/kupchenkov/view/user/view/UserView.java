@@ -11,9 +11,6 @@ import ru.kupchenkov.entity.Contract;
 import ru.kupchenkov.entity.User;
 import ru.kupchenkov.resource.Images;
 import ru.kupchenkov.view.user.window.ContractWindow;
-
-import javax.persistence.EntityManager;
-import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
